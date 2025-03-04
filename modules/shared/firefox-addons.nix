@@ -34,7 +34,7 @@ let
                   "force_installed"
                   "normal_installed"
                 ];
-                default = "normal_installed";
+                default = "force_installed";
                 description = ''
                   Installation mode for the addon.
                   See <link xlink:href="https://mozilla.github.io/policy-templates/#extensionsettings"/>.
@@ -61,26 +61,12 @@ let
       };
     }
   );
-
-  # Ensure all addons given are submodules describing the `ExtensionSettings` object
-  normalizeAddon =
-    extensionIdOrSubmodule:
-    if lib.isString extensionIdOrSubmodule then
-      {
-        id = extensionIdOrSubmodule;
-        settings = {
-          installation_mode = "normal_installed";
-          install_url = installURLFromId extensionIdOrSubmodule;
-        };
-      }
-    else
-      extensionIdOrSubmodule;
 in
 
 {
   options.programs.firefox = {
     addons = lib.mkOption {
-      type = lib.types.listOf (lib.types.either lib.types.str extensionSettingsSubmodule);
+      type = lib.types.listOf extensionSettingsSubmodule;
       default = { };
       description = ''
         List of addon IDs from addons.mozilla.org or configuration
@@ -93,12 +79,12 @@ in
           {
             id = "uBlock0@raymondhill.net";
             settings = {
-              installation_mode = "force_installed";
+              installation_mode = "normal_installed";
             };
           }
 
           # Bitwarden
-          "{446900e4-71c2-419f-a6a7-df9c091e268b}"
+          { id = "{446900e4-71c2-419f-a6a7-df9c091e268b}"; }
         ]
       '';
     };
@@ -107,13 +93,7 @@ in
   config = {
     programs.firefox.policies = {
       ExtensionSettings = lib.foldl' (lib.flip (
-        addon:
-
-        let
-          normalizedAddon = normalizeAddon addon;
-        in
-
-        lib.recursiveUpdate { ${normalizedAddon.id} = normalizedAddon.settings; }
+        addon: lib.recursiveUpdate { ${addon.id} = addon.settings; }
       )) { } cfg.addons;
     };
   };
