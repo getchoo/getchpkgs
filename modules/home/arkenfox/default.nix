@@ -30,8 +30,6 @@ let
     }
   ) (lib.importJSON ./arkenfox-hashes.json);
 
-  arkenfoxProfiles = lib.filterAttrs (lib.const (profile: profile.arkenfox.enable)) cfg.profiles;
-
   arkenfoxSubmodule =
     { config, ... }:
     {
@@ -70,25 +68,6 @@ in
 
   config = {
     home = {
-      # TODO: Find a better way to do this
-      activation.arkenfoxPrefsCleaner = lib.mkIf (arkenfoxProfiles != [ ]) (
-        lib.hm.dag.entryAfter [ "writeBoundary" "linkGeneration" ] (
-          lib.concatLines (
-            lib.mapAttrsToList (lib.const (
-              profile:
-
-              let
-                prefsCleanerPath = "${config.home.homeDirectory}/${profilesPath}/${profile.path}/prefsCleaner.sh";
-              in
-
-              "run --quiet cp ${
-                profile.arkenfox.source + "/prefsCleaner.sh"
-              } ${prefsCleanerPath} && run --quiet ${prefsCleanerPath}"
-            )) arkenfoxProfiles
-          )
-        )
-      );
-
       file = lib.mkMerge (
         lib.mapAttrsToList (lib.const (
           profile:
@@ -102,6 +81,7 @@ in
               || profile.arkenfox.enable;
 
             userJsPath = "${profilesPath}/${profile.path}/user.js";
+            prefsCleanerPath = dirOf userJsPath + "/prefsCleaner.sh";
 
             homeManagerUserJs =
               pkgs.writeText "home-manager-firefox-profile-${profile.name}-home-manager-userjs"
@@ -117,6 +97,13 @@ in
                 echo >> $out
                 cat ${homeManagerUserJs} >> $out
               '';
+
+              onChange = "${config.home.homeDirectory}/${prefsCleanerPath} -d -s";
+            };
+
+            ${prefsCleanerPath} = lib.mkIf profile.arkenfox.enable {
+              source = profile.arkenfox.source + "/prefsCleaner.sh";
+              executable = true;
             };
           }
         )) cfg.profiles
