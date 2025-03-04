@@ -98,7 +98,13 @@ in
                 cat ${homeManagerUserJs} >> $out
               '';
 
-              onChange = "${config.home.homeDirectory}/${prefsCleanerPath} -d -s";
+              onChange = ''
+                cd ${config.home.homeDirectory}/${dirOf prefsCleanerPath}
+
+                if [[ -f prefs.js ]]; then
+                  run --quiet ${config.home.homeDirectory}/${prefsCleanerPath} -d -s
+                fi
+              '';
             };
 
             ${prefsCleanerPath} = lib.mkIf profile.arkenfox.enable {
