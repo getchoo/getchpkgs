@@ -73,6 +73,7 @@
       };
 
       homeModules = {
+        arkenfox = self + "/modules/home/arkenfox";
         firefox-addons = self + "/modules/home/firefox-addons.nix";
       };
 
