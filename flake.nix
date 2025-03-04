@@ -67,26 +67,18 @@
         getchpkgs' // { default = getchpkgs'.treefetch or pkgs.emptyFile; }
       );
 
-      flakeModules = {
-        checks = self + "/modules/flake/checks.nix";
-        configurations = self + "/modules/flake/configurations.nix";
-      };
+      flakeModules = import ./modules/flake;
 
-      homeModules = {
-        arkenfox = self + "/modules/home/arkenfox";
-        firefox-addons = self + "/modules/home/firefox-addons.nix";
-      };
+      homeModules = import ./modules/home;
 
-      nixosModules = {
-        firefox-addons = self + "/modules/nixos/firefox-addons.nix";
-      };
+      nixosModules = import ./modules/nixos;
 
       formatter = forTier1Systems (system: nixpkgsFor.${system}.nixfmt-rfc-style);
 
       templates =
         let
           toTemplate = name: description: {
-            path = self + "/templates/${name}";
+            path = ./templates + "/${name}";
             inherit description;
           };
         in
