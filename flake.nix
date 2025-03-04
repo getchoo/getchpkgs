@@ -73,7 +73,6 @@
       };
 
       homeModules = {
-        riff = self + "/modules/home/riff.nix";
         firefox-addons = self + "/modules/home/firefox-addons.nix";
       };
 
