@@ -99,16 +99,23 @@ in
               '';
 
               onChange = ''
-                cd ${config.home.homeDirectory}/${dirOf prefsCleanerPath}
-
-                if [[ -f prefs.js ]]; then
-                  run --quiet ${config.home.homeDirectory}/${prefsCleanerPath} -d -s
+                if [[ -f ${config.home.homeDirectory}/${dirOf prefsCleanerPath}/prefs.js ]]; then
+                  ${config.home.homeDirectory}/${prefsCleanerPath} -d -s
                 fi
               '';
             };
 
             ${prefsCleanerPath} = lib.mkIf profile.arkenfox.enable {
-              source = profile.arkenfox.source + "/prefsCleaner.sh";
+              # Make sure the script doesn't traverse symlinks, else it'll end up trying to write to the store
+              source = pkgs.runCommand "home-manager-firefox-profile-${profile.name}-prefs-cleaner" { } ''
+                cp ${profile.arkenfox.source + "/prefsCleaner.sh"} $out
+                chmod +w $out
+                substituteInPlace $out \
+                  --replace-fail \
+                  'SCRIPT_FILE=$(readlink -f "''${BASH_SOURCE[0]}" 2>/dev/null || greadlink -f "''${BASH_SOURCE[0]}" 2>/dev/null)' \
+                  'SCRIPT_FILE="''${BASH_SOURCE[0]}"'
+              '';
+
               executable = true;
             };
           }
