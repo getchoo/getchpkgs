@@ -30,6 +30,9 @@ let
     }
   ) (lib.importJSON ./arkenfox-hashes.json);
 
+  latestVersionIn =
+    versions: lib.elemAt (lib.sort lib.versionOlder versions) (lib.length versions - 1);
+
   arkenfoxSubmodule =
     { config, ... }:
     {
@@ -39,8 +42,7 @@ let
 
           version = lib.mkOption {
             type = lib.types.str;
-            default = lib.versions.majorMinor pkgs.firefox.version;
-            defaultText = lib.literalExpression "lib.versions.majorMinor pkgs.firefox.version";
+            default = latestVersionIn (lib.attrNames arkenfoxVersions);
             description = ''
               Version of Arkenfox to apply.
 
