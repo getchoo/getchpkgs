@@ -68,7 +68,7 @@ in
     type = lib.types.attrsOf (lib.types.submodule arkenfoxSubmodule);
   };
 
-  config = {
+  config = lib.mkIf config.programs.firefox.enable {
     home = {
       file = lib.mkMerge (
         lib.mapAttrsToList (lib.const (
