@@ -15,7 +15,8 @@ rustPlatform.buildRustPackage {
     hash = "sha256-FDiulTit492KwV46A3qwjHQwzpjVJvIXTfTrMufXd5k=";
   };
 
-  cargoHash = "sha256-8HJYYPBogkgEfK3kv8dFUFaqUhvgYAOrhUIyZo3bqp8=";
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-cbJ3Xr9oxMTfEtjcqeFL8c76p8bMMf3lbcdGU3cGvRA=";
 
   meta = {
     description = "A plant-based system fetch tool made with Rust.";
