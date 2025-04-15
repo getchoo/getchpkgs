@@ -1,3 +1,4 @@
 {
-        firefox-addons = ./firefox-addons.nix;
-      }
+  firefox-addons = ./firefox-addons.nix;
+  systemd-discord-notifier = ./systemd-discord-notifier.nix;
+}
