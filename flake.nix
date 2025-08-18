@@ -27,20 +27,24 @@
     {
       checks = forTier1Systems (
         system:
+
         let
           pkgs = nixpkgsFor.${system};
-
-          mkCheck =
-            name: deps: script:
-            pkgs.runCommand name { nativeBuildInputs = deps; } ''
-              ${script}
-              touch $out
-            '';
         in
+
         {
-          deadnix = mkCheck "check-deadnix" [ pkgs.deadnix ] "deadnix --fail ${self}";
-          nixfmt = mkCheck "check-nixfmt" [ pkgs.nixfmt-rfc-style ] "nixfmt --check ${self}/**.nix";
-          statix = mkCheck "check-statix" [ pkgs.statix ] "statix check ${self}";
+          treefmt = pkgs.stdenvNoCC.mkDerivation {
+            name = "check-treefmt";
+
+            src = self;
+
+            nativeBuildInputs = [ self.formatter.${system} ];
+
+            buildCommand = ''
+              runPhase unpackPhase
+              treefmt --ci |& tee $out
+            '';
+          };
         }
       );
 
@@ -73,7 +77,39 @@
 
       nixosModules = import ./modules/nixos;
 
-      formatter = forTier1Systems (system: nixpkgsFor.${system}.nixfmt-rfc-style);
+      formatter = forTier1Systems (
+        system:
+
+        let
+          pkgs = nixpkgsFor.${system};
+
+          nixFiles = "*.nix";
+        in
+
+        pkgs.treefmt.withConfig {
+          settings = {
+            tree-root-file = "flake.nix";
+
+            formatter = {
+              deadnix = {
+                command = lib.getExe pkgs.deadnix;
+                options = [ "--edit" ];
+                includes = [ nixFiles ];
+              };
+
+              nixfmt = {
+                command = lib.getExe pkgs.nixfmt;
+                includes = [ nixFiles ];
+              };
+
+              nixf-diagnose = {
+                command = lib.getExe pkgs.nixf-diagnose;
+                includes = [ nixFiles ];
+              };
+            };
+          };
+        }
+      );
 
       templates =
         let
