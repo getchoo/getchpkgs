@@ -26,7 +26,6 @@ rustPlatform.buildRustPackage rec {
     ln -sf ${passthru.libthermite} source/thermite
   '';
 
-  useFetchCargoVendor = true;
   cargoHash = "sha256-2Hmy0nkdUhwBJstMkff3t7oEHyAbkud9JxY3SXb3c9c=";
 
   nativeBuildInputs = [
