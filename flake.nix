@@ -54,22 +54,18 @@
         let
           pkgs = nixpkgsFor.${system};
 
-          getchpkgs = import ./default.nix { inherit pkgs; };
+          availableOnSystem = lib.meta.availableOn pkgs.stdenv.hostPlatform;
 
+          getchpkgs = import ./default.nix { inherit pkgs; };
           getchpkgs' = lib.filterAttrs (lib.const (
-            deriv:
-            let
-              isCross = deriv.stdenv.buildPlatform != deriv.stdenv.hostPlatform;
-              availableOnHost = lib.meta.availableOn pkgs.stdenv.hostPlatform deriv;
-              # `nix flake check` doesn't like broken packages
-              isBroken = deriv.meta.broken or false;
-            in
-            isCross || availableOnHost && (!isBroken)
+            deriv: !(deriv.meta.broken or false) && availableOnSystem deriv
           )) getchpkgs;
         in
 
         getchpkgs' // { default = getchpkgs'.treefetch or pkgs.emptyFile; }
       );
+
+      overlays.default = final: prev: import ./overlay.nix final prev;
 
       flakeModules = import ./modules/flake;
 

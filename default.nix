@@ -20,10 +20,7 @@ in
 let
   inherit (pkgs) lib;
 
-  getchpkgs = lib.packagesFromDirectoryRecursive {
-    callPackage = lib.callPackageWith (pkgs // getchpkgs);
-    directory = ./pkgs;
-  };
+  packageScope = lib.makeScope pkgs.newScope (lib.flip (import ./overlay.nix) pkgs);
 in
 
-getchpkgs
+lib.filterAttrs (lib.const lib.isDerivation) packageScope
