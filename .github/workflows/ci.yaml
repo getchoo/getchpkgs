@@ -47,9 +47,10 @@ jobs:
         env:
           SYSTEM: ${{ matrix.system }}
         run: |
-          nix build \
-            --fallback --print-build-logs --show-trace \
-            ".#hydraJobs.$SYSTEM.all-packages"
+          nix flake check \
+            --accept-flake-config \
+            --print-build-logs \
+            --show-trace
 
   release-gate:
     name: Release gate

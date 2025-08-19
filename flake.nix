@@ -46,6 +46,7 @@
             '';
           };
         }
+        // lib.mapAttrs' (name: lib.nameValuePair "check-${name}") self.packages.${system}
       );
 
       packages = forAllSystems (
@@ -118,11 +119,5 @@
           standard = "Minimal boilerplate for my Flakes";
           nixos = "Minimal boilerplate for a Flake-based NixOS configuration";
         };
-
-      hydraJobs = forTier1Systems (system: {
-        all-packages = nixpkgsFor.${system}.linkFarm "all-packages" (
-          lib.mapAttrs (lib.const (deriv: deriv.outPath or deriv)) self.packages.${system}
-        );
-      });
     };
 }
