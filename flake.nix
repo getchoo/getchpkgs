@@ -109,12 +109,14 @@
       );
 
       templates =
+
         let
           toTemplate = name: description: {
-            path = ./templates + "/${name}";
+            path = ./templates/${name};
             inherit description;
           };
         in
+
         lib.mapAttrs toTemplate {
           standard = "Minimal boilerplate for my Flakes";
           nixos = "Minimal boilerplate for a Flake-based NixOS configuration";

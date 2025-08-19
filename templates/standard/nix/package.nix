@@ -1,1 +1,1 @@
-{ runCommand }: runCommand "hello" { } "echo 'hello' > $out"
+{ runCommand }: runCommand "cool-package" { } "echo 'hello' > $out"

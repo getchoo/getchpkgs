@@ -6,11 +6,6 @@
   },
   nixpkgs ? <nixpkgs>,
   system ? builtins.currentSystem,
-  hello ? (import ./default.nix { inherit pkgs; }).hello,
 }:
 
-pkgs.mkShell {
-  packages = [ pkgs.bash ];
-
-  inputsFrom = [ hello ];
-}
+(import ./default.nix { inherit pkgs; }).shell

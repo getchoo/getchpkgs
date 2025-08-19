@@ -11,11 +11,14 @@
 let
   inherit (pkgs) lib;
 
-  callPackage = lib.callPackageWith (pkgs // pkgs');
-
-  pkgs' = {
-    hello = callPackage ./nix/package.nix { };
-  };
+  packageScope = lib.makeScope pkgs.newScope (lib.flip (import ./overlay.nix) pkgs);
+  packages = lib.filterAttrs (lib.const lib.isDerivation) packageScope;
 in
 
-pkgs'
+{
+  inherit packages;
+  shell = pkgs.mkShellNoCC {
+    packages = [ pkgs.bash ];
+    inputsFrom = [ packages.cool-package ];
+  };
+}
