@@ -1,7 +1,6 @@
 # getchpkgs
 
 [![Build status](https://img.shields.io/github/actions/workflow/status/getchoo/getchpkgs/ci.yaml?style=flat-square&logo=github&label=Build%20status&color=5277c3)](https://github.com/getchoo/getchpkgs/actions/workflows/ci.yaml)
-[![FlakeHub](https://img.shields.io/endpoint?url=https://flakehub.com/f/getchoo/getchpkgs/badge)](https://flakehub.com/flake/getchoo/getchpkgs)
 
 My nix expressions not quite ready for nixpkgs yet - if ever
 
