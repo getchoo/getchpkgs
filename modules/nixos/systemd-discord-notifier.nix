@@ -9,7 +9,7 @@
 let
   cfg = config.services.systemd-discord-notifier;
 
-  unitFormat = pkgs.formats.systemd;
+  unitFormat = pkgs.formats.systemd { };
   systemVendorDir = "lib/systemd/system";
 
   systemdPackage = pkgs.linkFarm "systemd-discord-notifier-unit-overrides" (
